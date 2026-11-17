@@ -63,7 +63,10 @@ export function Dashboard() {
   useEffect(() => {
     jevx.getProjects().then(data => {
       const list = Array.isArray(data) ? data : (data as { data?: unknown[] }).data || []
-      setCases(list.map((c: { id: number; title: string }) => ({ id: c.id, title: c.title })))
+      setCases(list.map((c: unknown) => {
+        const item = c as { id: number; title: string }
+        return { id: item.id, title: item.title }
+      }))
     }).catch(() => {})
   }, [])
 

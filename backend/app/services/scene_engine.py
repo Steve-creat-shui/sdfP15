@@ -159,6 +159,180 @@ _OBJ_TYPE_EN: dict[str, str] = {
     "空间关系": "spatial marker",
 }
 
+# ⭐ 常见物证类型 → 英文详细描述映射
+# 用于增强 scene prompt 中物品的描述准确性
+# 格式: (中文关键词, 英文物品类型描述)
+# 优先级：长关键词在前
+_ITEM_TYPE_DESC: list[tuple[str, str]] = [
+    # 凶器/工具类
+    ("水果刀", "a small kitchen fruit knife with a metal blade and plastic handle"),
+    ("菜刀", "a kitchen chef knife with a stainless steel blade"),
+    ("匕首", "a dagger with a sharp double-edged blade"),
+    ("尖刀", "a sharp pointed knife"),
+    ("水果刀", "a small paring knife"),
+    ("美工刀", "a utility knife with a retractable blade"),
+    ("剪刀", "a pair of metal scissors"),
+    ("斧头", "an axe with a wooden handle"),
+    ("锤子", "a hammer with a metal head"),
+    ("铁棍", "an iron rod or metal bar"),
+    ("木棍", "a wooden stick or club"),
+    ("螺丝刀", "a screwdriver"),
+    ("扳手", "a wrench"),
+    ("砖块", "a brick"),
+    ("玻璃碎片", "broken glass shards"),
+    ("酒瓶", "a glass wine bottle"),
+    ("啤酒瓶", "a glass beer bottle"),
+
+    # 电子设备类
+    ("智能手机", "a modern smartphone with a touchscreen"),
+    ("苹果手机", "an iPhone smartphone"),
+    ("安卓手机", "an Android smartphone"),
+    ("手机", "a mobile smartphone with a glass screen"),
+    ("破碎的手机", "a broken smartphone with a cracked screen"),
+    ("手机屏幕", "a cracked smartphone screen"),
+    ("笔记本电脑", "a laptop computer"),
+    ("电脑", "a desktop computer with monitor"),
+    ("平板电脑", "a tablet computer"),
+    ("U盘", "a USB flash drive"),
+    ("移动硬盘", "a portable external hard drive"),
+    ("相机", "a digital camera"),
+    ("录音笔", "a digital voice recorder"),
+    ("耳机", "a pair of earphones"),
+    ("充电器", "a phone charger with cable"),
+    ("数据线", "a USB data cable"),
+    ("电话", "a telephone"),
+    ("对讲机", "a walkie-talkie radio"),
+
+    # 衣物/纺织品类
+    ("血衣", "a bloodstained piece of clothing"),
+    ("上衣", "a shirt or top garment"),
+    ("外套", "a jacket or coat"),
+    ("裤子", "a pair of trousers or pants"),
+    ("T恤", "a cotton T-shirt"),
+    ("衬衫", "a button-up dress shirt"),
+    ("牛仔裤", "a pair of blue jeans"),
+    ("内裤", "a pair of underwear"),
+    ("内衣", "undergarments"),
+    ("袜子", "a pair of socks"),
+    ("手套", "a pair of gloves"),
+    ("帽子", "a hat or cap"),
+    ("围巾", "a scarf"),
+    ("毛巾", "a bath towel"),
+    ("纸巾", "tissue paper"),
+    ("床单", "a bed sheet"),
+    ("被套", "a duvet cover"),
+    ("枕头", "a pillow"),
+
+    # 鞋类
+    ("拖鞋", "a pair of slippers"),
+    ("运动鞋", "a pair of athletic sneakers"),
+    ("皮鞋", "a pair of leather shoes"),
+    ("高跟鞋", "a pair of high-heeled shoes"),
+    ("靴子", "a pair of boots"),
+    ("凉鞋", "a pair of sandals"),
+
+    # 容器/器皿类
+    ("玻璃杯", "a clear drinking glass"),
+    ("水杯", "a drinking cup"),
+    ("保温杯", "a thermos cup"),
+    ("塑料杯", "a plastic cup"),
+    ("陶瓷杯", "a ceramic mug"),
+    ("酒瓶", "a glass liquor bottle"),
+    ("药瓶", "a medicine bottle"),
+    ("花瓶", "a glass vase"),
+    ("碗", "a bowl"),
+    ("盘子", "a plate"),
+    ("筷子", "a pair of chopsticks"),
+    ("勺子", "a spoon"),
+
+    # 家具类
+    ("椅子", "a chair"),
+    ("凳子", "a wooden stool"),
+    ("桌子", "a table"),
+    ("书桌", "a desk"),
+    ("沙发", "a sofa"),
+    ("茶几", "a coffee table"),
+    ("床", "a bed"),
+    ("衣柜", "a wardrobe"),
+    ("柜子", "a cabinet"),
+    ("抽屉", "a drawer"),
+    ("书架", "a bookshelf"),
+
+    # 日常用品类
+    ("钥匙", "a set of keys"),
+    ("钱包", "a wallet"),
+    ("手提包", "a handbag"),
+    ("背包", "a backpack"),
+    ("手表", "a wristwatch"),
+    ("眼镜", "a pair of eyeglasses"),
+    ("戒指", "a ring"),
+    ("项链", "a necklace"),
+    ("打火机", "a lighter"),
+    ("香烟", "a cigarette"),
+    ("烟头", "a cigarette butt"),
+    ("火柴", "a box of matches"),
+    ("雨伞", "an umbrella"),
+    ("手电筒", "a flashlight"),
+
+    # 药品/化学品类
+    ("药品", "medication or pills"),
+    ("药片", "pills or tablets"),
+    ("胶囊", "medicine capsules"),
+    ("注射器", "a syringe"),
+    ("针管", "a needle and syringe"),
+    ("农药", "a bottle of pesticide"),
+    ("毒药", "a bottle of toxic substance"),
+
+    # 文件/纸张类
+    ("纸条", "a piece of paper note"),
+    ("信件", "a letter"),
+    ("笔记本", "a notebook"),
+    ("日记本", "a diary"),
+    ("合同", "a contract document"),
+    ("身份证", "an ID card"),
+    ("银行卡", "a bank card"),
+    ("名片", "a business card"),
+
+    # 食物类
+    ("水果", "fresh fruit"),
+    ("饭菜", "food and dishes"),
+    ("饮料", "a beverage drink"),
+    ("水杯", "a cup with liquid"),
+
+    # 结构类
+    ("门", "a door"),
+    ("窗户", "a window"),
+    ("门锁", "a door lock"),
+    ("窗户锁", "a window lock"),
+    ("墙面", "a wall"),
+    ("地板", "a floor"),
+    ("天花板", "a ceiling"),
+    ("楼梯", "a staircase"),
+    ("走廊", "a hallway corridor"),
+]
+
+
+def _enrich_item_description(description: str) -> str:
+    """根据中文描述匹配并添加英文物品类型详情，提升生成准确性。
+
+    Args:
+        description: 中文物品描述，如 "水果刀"、"破碎的手机"
+
+    Returns:
+        str: 增强后的英文描述（如果匹配到），否则返回原文
+    """
+    # ⭐ 按关键词长度从长到短排序，确保更具体的描述优先匹配
+    # 例如："破碎的手机" 优先于 "手机"
+    sorted_patterns = sorted(
+        _ITEM_TYPE_DESC,
+        key=lambda x: len(x[0]),
+        reverse=True,
+    )
+    for cn_kw, en_desc in sorted_patterns:
+        if cn_kw in description:
+            return en_desc
+    return description
+
 _STATE_ADJ_EN: dict[str, str] = {
     "bloody": "bloodstained",
     "broken": "broken",
@@ -178,10 +352,150 @@ _STATE_ADJ_EN: dict[str, str] = {
     "full": "full",
 }
 
-# ⭐ 中文状态键 → 英文描述（LLM 返回的中文键不固定，做关键词匹配）
-# 优先级：长的关键词放在前面，避免被短的截胡
-_CN_STATE_PATTERNS: list[tuple[str, str]] = [
-    # 血迹/血液相关（高优先级，描述更醒目）
+# ⭐ 中文状态键 → 英文描述（三级：安全版 / 中等版 / 详细版）
+# 安全版：极简，确保通过安全过滤
+# 中等版：增加细节但避免高风险词，在安全和效果之间平衡
+# 详细版：完整细节，用于安全过滤宽松的模型
+
+_CN_STATE_PATTERNS_SAFE: list[tuple[str, str]] = [
+    ("喷溅血迹", "with reddish-brown splash marks"),
+    ("擦拭状血迹", "with smudged reddish-brown marks"),
+    ("滴落状血迹", "with drip marks"),
+    ("血迹分布", "with distributed discoloration"),
+    ("干涸血迹", "with dark brown dried marks"),
+    ("氧化血迹", "with dark brown oxidized marks"),
+    ("接触性出血", "with contact transfer marks"),
+    ("鲜血", "with red-brown wet marks"),
+    ("血迹", "with reddish-brown marks"),
+    ("血痕", "with reddish-brown marks"),
+    ("带血", "with red-brown marks"),
+    ("血", "with reddish-brown marks"),
+    ("唾液印记", "with dark moist marks"),
+    ("唾液斑", "with dark moist marks"),
+    ("唾液", "with dark wet marks"),
+    ("精斑", "with biological marks"),
+    ("精液", "with biological marks"),
+    ("凌乱", "in a disarranged state"),
+    ("混乱", "in a disarranged state"),
+    ("翻倒", "overturned"),
+    ("打斗痕迹", "with signs of disturbance"),
+    ("挣扎痕迹", "with signs of disturbance"),
+    ("指纹", "with visible print marks"),
+    ("掌纹", "with visible palm prints"),
+    ("毛发", "with visible hair strands"),
+    ("纤维", "with visible fabric fibers"),
+    ("泥土", "with soil residue"),
+    ("灰尘", "with dust marks"),
+    ("毒物", "with toxic residue"),
+    ("药物", "with drug residue"),
+    ("破碎", "broken"),
+    ("碎片", "shattered"),
+    ("散落", "scattered"),
+    ("划痕", "with scratches"),
+    ("撕裂", "torn"),
+    ("烧灼", "charred"),
+    ("污渍", "stained"),
+    ("湿润", "wet surface"),
+    ("锈蚀", "rusted"),
+    ("裂纹", "cracked"),
+    ("折叠", "folded"),
+    ("开启", "open"),
+    ("关闭", "closed"),
+    ("上锁", "locked"),
+    ("空的", "empty"),
+    ("装满", "full"),
+    ("凶器", "tool item"),
+    ("生物痕迹", "with trace materials"),
+    ("DNA", "with trace materials"),
+    ("钝器伤", "with blunt force marks"),
+    ("锐器伤", "with sharp force marks"),
+    ("牙齿印", "with bite marks"),
+    ("抓痕", "with scratch marks"),
+    ("淤青", "with bruise marks"),
+    ("挫伤", "with contusion marks"),
+    ("擦挫伤", "with abrasion marks"),
+    ("表皮剥脱", "with abrasion marks"),
+    ("皮下出血", "with subcutaneous discoloration"),
+    ("创口", "with open wound"),
+    ("裂伤", "with laceration"),
+    ("砍创", "with chop mark"),
+    ("刺创", "with stab mark"),
+    ("骨折", "with fracture"),
+    ("红肿", "with swelling"),
+    ("肿胀", "with swelling"),
+    ("皮下淤血", "with subcutaneous hematoma"),
+]
+
+_CN_STATE_PATTERNS_MEDIUM: list[tuple[str, str]] = [
+    ("喷溅血迹", "with noticeable reddish-brown splash patterns on the surface"),
+    ("擦拭状血迹", "with smudged reddish-brown wipe patterns on the surface"),
+    ("滴落状血迹", "with distinct drip mark patterns on the surface"),
+    ("血迹分布", "with distributed reddish-brown discoloration areas"),
+    ("干涸血迹", "with dark brown dried stain marks on the surface"),
+    ("氧化血迹", "with dark brown oxidized discoloration marks"),
+    ("接触性出血", "with contact transfer stain marks visible"),
+    ("鲜血", "with bright red-brown wet stain marks on the surface"),
+    ("血迹", "with noticeable reddish-brown stain marks on the surface"),
+    ("血痕", "with noticeable reddish-brown stain marks on the surface"),
+    ("带血", "with prominent red-brown stains on the surface"),
+    ("血", "with visible reddish-brown stain marks"),
+    ("唾液印记", "with distinct dark moist stain marks on the surface"),
+    ("唾液斑", "with distinct dark moist stain marks on the surface"),
+    ("唾液", "with visible dark wet stain marks on the surface"),
+    ("精斑", "with visible biological stain marks"),
+    ("精液", "with visible biological stain marks"),
+    ("凌乱", "in a messy, disarranged state with items displaced and scattered"),
+    ("混乱", "in a messy, disarranged state with items displaced and scattered"),
+    ("翻倒", "overturned, knocked over and tipped on its side"),
+    ("打斗痕迹", "with signs of physical disturbance, items displaced and knocked over"),
+    ("挣扎痕迹", "with signs of physical disturbance and displaced items"),
+    ("指纹", "with visible fingerprint marks on the surface"),
+    ("掌纹", "with visible palm print marks on the surface"),
+    ("毛发", "with visible hair strands present"),
+    ("纤维", "with visible fabric fibers present"),
+    ("泥土", "with soil residue and dirt marks visible"),
+    ("灰尘", "with dust and dirt marks visible"),
+    ("毒物", "with toxic substance residue visible"),
+    ("药物", "with drug substance residue visible"),
+    ("破碎", "broken or shattered into pieces"),
+    ("碎片", "shattered into small fragments"),
+    ("散落", "scattered across the ground"),
+    ("划痕", "with visible cut marks or scratches on the surface"),
+    ("撕裂", "torn, ripped material visible"),
+    ("烧灼", "charred, burnt marks visible"),
+    ("污渍", "stained, dirty marks visible"),
+    ("湿润", "wet, moist surface visible"),
+    ("锈蚀", "rusted, with rust stains visible"),
+    ("裂纹", "cracked, with crack lines visible"),
+    ("折叠", "folded"),
+    ("开启", "in open state"),
+    ("关闭", "closed"),
+    ("上锁", "locked"),
+    ("空的", "empty"),
+    ("装满", "full"),
+    ("凶器", "sharp tool item"),
+    ("生物痕迹", "with biological trace materials visible"),
+    ("DNA", "with potential biological trace materials"),
+    ("钝器伤", "with blunt force injury marks"),
+    ("锐器伤", "with sharp force injury marks, cut marks"),
+    ("牙齿印", "with teeth marks, bite marks visible"),
+    ("抓痕", "with scratch marks visible"),
+    ("淤青", "with bruise marks, contusion visible"),
+    ("挫伤", "with contusion, bruising visible"),
+    ("擦挫伤", "with abrasion and contusion marks"),
+    ("表皮剥脱", "with skin abrasion marks visible"),
+    ("皮下出血", "with subcutaneous discoloration visible"),
+    ("创口", "with open wound visible"),
+    ("裂伤", "with laceration wound visible"),
+    ("砍创", "with chop wound mark visible"),
+    ("刺创", "with stab wound mark visible"),
+    ("骨折", "with bone fracture visible"),
+    ("红肿", "with swelling, red and swollen"),
+    ("肿胀", "with swelling visible"),
+    ("皮下淤血", "with subcutaneous hematoma visible"),
+]
+
+_CN_STATE_PATTERNS_DETAILED: list[tuple[str, str]] = [
     ("喷溅血迹", "with prominent bright red blood spatter on the surface, fresh blood splashes clearly visible"),
     ("擦拭状血迹", "with smeared bloodstain patterns, wipe marks from blood clearly visible"),
     ("滴落状血迹", "with dripped bloodstain pattern, round blood drops clearly visible"),
@@ -194,31 +508,24 @@ _CN_STATE_PATTERNS: list[tuple[str, str]] = [
     ("血痕", "with prominent vivid red blood stains, fresh blood stains clearly visible on the surface"),
     ("带血", "covered with prominent vivid red blood stains, fresh blood clearly visible"),
     ("血", "with visible blood stains"),
-    # 唾液/生物痕迹
     ("唾液印记", "with prominent dark saliva stain marks on the surface, saliva residue clearly visible as dark wet patches"),
     ("唾液斑", "with prominent dark saliva stain marks on the surface, saliva residue clearly visible as dark wet patches"),
     ("唾液", "with visible dark saliva stains and moist saliva residue"),
     ("精斑", "with visible biological stain marks"),
     ("精液", "with visible biological stain marks"),
-    # 现场混乱（凌乱、散落等）
     ("凌乱", "in a chaotic, messy state, items scattered and overturned, signs of struggle visible"),
     ("混乱", "in a chaotic, messy state, items scattered and overturned, signs of struggle visible"),
     ("翻倒", "overturned, knocked over, tipped on its side"),
     ("打斗痕迹", "with clear signs of violent struggle, items displaced and knocked over"),
     ("挣扎痕迹", "with clear signs of struggle and resistance"),
-    # 指纹掌纹
     ("指纹", "with visible fingerprints on the surface"),
     ("掌纹", "with visible palm prints on the surface"),
-    # 毛发/纤维
     ("毛发", "with visible hair fibers"),
     ("纤维", "with visible fabric fibers"),
-    # 泥土灰尘
     ("泥土", "with soil residue and dirt marks visible"),
     ("灰尘", "with dust and dirt marks visible"),
-    # 毒物药物
     ("毒物", "with toxic substance residue visible"),
     ("药物", "with drug residue visible"),
-    # 物理状态
     ("破碎", "broken or shattered into pieces"),
     ("碎片", "shattered into fragments"),
     ("散落", "scattered on the ground"),
@@ -235,12 +542,9 @@ _CN_STATE_PATTERNS: list[tuple[str, str]] = [
     ("上锁", "locked"),
     ("空的", "empty"),
     ("装满", "full"),
-    # 凶器
     ("凶器", "weapon, murder weapon"),
-    # 生物痕迹
     ("生物痕迹", "with biological trace evidence visible"),
     ("DNA", "with potential DNA evidence"),
-    # 伤情相关
     ("钝器伤", "with blunt force injury marks"),
     ("锐器伤", "with sharp force injury marks, cut marks"),
     ("牙齿印", "with teeth marks, bite marks visible"),
@@ -260,44 +564,50 @@ _CN_STATE_PATTERNS: list[tuple[str, str]] = [
     ("皮下淤血", "with subcutaneous hematoma visible"),
 ]
 
+# 默认使用安全版（向后兼容）
+_CN_STATE_PATTERNS = _CN_STATE_PATTERNS_SAFE
 
-def _translate_state(state: dict | None) -> str:
+
+def _translate_state(state: dict | None, patterns: list[tuple[str, str]] | None = None) -> str:
     """将状态 dict 转为英文描述字符串。支持英文键和中文键两种格式。
 
     字符串类型的值（如 fingerprints: "张默"）会被保留为 key:value 对，
     确保细节信息（指纹归属、血迹来源等）不丢失。
+
+    patterns: 指定使用的状态映射版本（安全版或详细版）
     """
     if not state:
         return ""
+    if patterns is None:
+        patterns = _CN_STATE_PATTERNS
     parts = []
     for k, v in state.items():
         if isinstance(v, bool) and v is True:
-            # 先查英文映射
             adj = _STATE_ADJ_EN.get(k)
             if not adj:
-                # 中文键：用关键词匹配
-                adj = _match_cn_state(k)
+                adj = _match_cn_state(k, patterns=patterns)
             parts.append(adj)
         elif isinstance(v, str):
-            # ⭐ 修复：字符串值始终保留，不按 key 长度丢弃
-            # 先尝试中文关键词匹配
-            cn_match = _match_cn_state(k)
+            cn_match = _match_cn_state(k, patterns=patterns)
             if cn_match != k:
-                # 关键词命中：输出英文描述 + 详细信息
                 parts.append(f"{cn_match} ({v})")
             else:
-                # 未命中：保留原始 key:value，给 AI 上下文
                 parts.append(f"{k}: {v}")
         elif isinstance(v, bool) and v is False:
-            pass  # 跳过 false 的 boolean 状态
+            pass
         else:
             parts.append(f"{k}: {v}")
     return ", ".join(parts)
 
 
-def _match_cn_state(key: str) -> str:
-    """用中文关键词匹配英文状态描述。"""
-    for cn_kw, en_desc in _CN_STATE_PATTERNS:
+def _match_cn_state(key: str, patterns: list[tuple[str, str]] | None = None) -> str:
+    """用中文关键词匹配英文状态描述。
+
+    patterns: 指定使用的状态映射版本（安全版或详细版）
+    """
+    if patterns is None:
+        patterns = _CN_STATE_PATTERNS
+    for cn_kw, en_desc in patterns:
         if cn_kw in key:
             return en_desc
     return key
@@ -307,17 +617,80 @@ def _match_cn_state(key: str) -> str:
 # 场景级别环境信号聚合（确保地面血迹/混乱等不只依附于单个物证）
 # ==============================================================================
 
+# 场景级别环境信号聚合（安全版和详细版）
 # (触发关键词集合, 场景级别描述)
-# 集合内的关键词在所有物证 state/description 中出现任一即触发
-_SCENE_LEVEL_SIGNALS: list[tuple[set[str], str]] = [
-    # 混乱/打斗（场景级别）
+_SCENE_LEVEL_SIGNALS_SAFE: list[tuple[set[str], str]] = [
+    (
+        {"凌乱", "混乱", "翻倒", "打斗痕迹", "挣扎痕迹", "chaotic", "messy", "overturned", "struggle"},
+        "The room appears disarranged with items out of their usual placement — "
+        "furniture and objects are displaced, scattered, and some are overturned.",
+    ),
+    (
+        {"血迹", "喷溅血迹", "干涸血迹", "滴落状血迹", "擦拭状血迹", "血痕", "鲜血", "带血", "血", "bloody", "blood"},
+        "Reddish-brown discoloration marks are visible on the floor — "
+        "pooled areas and marked discolorations on floor surfaces.",
+    ),
+    (
+        {"唾液", "唾液印记", "唾液斑", "saliva"},
+        "Dark moist patches are visible on floor surfaces and nearby objects.",
+    ),
+    (
+        {"破碎", "碎片", "散落", "broken", "shattered", "scattered"},
+        "Broken fragments and scattered debris are present on the floor.",
+    ),
+    (
+        {"指纹", "掌纹", "fingerprints", "palm"},
+        "Visible print marks are present on item surfaces and adjacent walls.",
+    ),
+    (
+        {"生物痕迹", "DNA", "毛发", "纤维", "biological", "dna", "hair", "fiber"},
+        "Trace evidence materials (hair strands, fabric fibers) are present "
+        "in the scene, scattered on the floor and around evidence items.",
+    ),
+]
+
+_SCENE_LEVEL_SIGNALS_MEDIUM: list[tuple[set[str], str]] = [
+    (
+        {"凌乱", "混乱", "翻倒", "打斗痕迹", "挣扎痕迹", "chaotic", "messy", "overturned", "struggle"},
+        "The room is in a messy, disarranged state — furniture and objects are displaced, "
+        "scattered across the floor, and some are overturned. Signs of physical disturbance "
+        "are visible throughout the scene, with items knocked over and personal effects spread about.",
+    ),
+    (
+        {"血迹", "喷溅血迹", "干涸血迹", "滴落状血迹", "擦拭状血迹", "血痕", "鲜血", "带血", "血", "bloody", "blood"},
+        "Noticeable reddish-brown stain patterns are visible on the floor throughout the scene — "
+        "pooled areas, splash patterns, drip marks, and smudged discolorations on floor surfaces. "
+        "These stain marks appear as distinct red-brown colorations, clearly noticeable "
+        "and not subtle or faint.",
+    ),
+    (
+        {"唾液", "唾液印记", "唾液斑", "saliva"},
+        "Distinct dark moist stain patches are visible on floor surfaces and nearby objects — "
+        "appearing as clear dark wet areas with a moist sheen, noticeable against the surfaces.",
+    ),
+    (
+        {"破碎", "碎片", "散落", "broken", "shattered", "scattered"},
+        "Broken fragments and scattered debris are spread across the floor, "
+        "with shattered pieces dispersed around the scene area.",
+    ),
+    (
+        {"指纹", "掌纹", "fingerprints", "palm"},
+        "Visible fingerprint and palm print marks are present on item surfaces and adjacent walls.",
+    ),
+    (
+        {"生物痕迹", "DNA", "毛发", "纤维", "biological", "dna", "hair", "fiber"},
+        "Biological trace materials (hair strands, fabric fibers, other small particles) "
+        "are present in the scene, scattered on the floor and around evidence items.",
+    ),
+]
+
+_SCENE_LEVEL_SIGNALS_DETAILED: list[tuple[set[str], str]] = [
     (
         {"凌乱", "混乱", "翻倒", "打斗痕迹", "挣扎痕迹", "chaotic", "messy", "overturned", "struggle"},
         "The WHOLE ROOM is in CHAOTIC, MESSY DISARRAY — furniture and items are displaced, "
         "scattered, knocked over, and overturned. Clear SIGNS OF VIOLENT STRUGGLE are visible "
         "throughout the scene. The overall environment looks disheveled and disturbed.",
     ),
-    # 地面血迹（场景级别，区别于物证上的血迹）
     (
         {"血迹", "喷溅血迹", "干涸血迹", "滴落状血迹", "擦拭状血迹", "血痕", "鲜血", "带血", "血", "bloody", "blood"},
         "PROMINENT VIVID RED BLOOD STAINS are clearly visible on the FLOOR throughout the scene — "
@@ -325,24 +698,20 @@ _SCENE_LEVEL_SIGNALS: list[tuple[set[str], str]] = [
         "bloodstain marks on the floor. The blood appears fresh, BRIGHT RED, and HIGHLY VISIBLE — "
         "not subtle or hidden. The floor shows clear evidence of bloodshed.",
     ),
-    # 唾液（场景级别）
     (
         {"唾液", "唾液印记", "唾液斑", "saliva"},
         "DARK WET SALIVA STAIN MARKS are visible on the floor and surfaces — "
         "saliva residue appears as distinct dark wet patches, highly visible and unmistakable.",
     ),
-    # 破碎/碎片（场景级别）
     (
         {"破碎", "碎片", "散落", "broken", "shattered", "scattered"},
         "Broken fragments and scattered debris are visible on the floor, "
         "items appear smashed and scattered around the scene.",
     ),
-    # 指纹（场景级别）
     (
         {"指纹", "掌纹", "fingerprints", "palm"},
         "Visible fingerprints and palm prints on the surfaces of items and nearby walls.",
     ),
-    # 生物痕迹（场景级别）
     (
         {"生物痕迹", "DNA", "毛发", "纤维", "biological", "dna", "hair", "fiber"},
         "Biological trace evidence (hair fibers, fabric fibers, potential DNA) is visible "
@@ -350,8 +719,11 @@ _SCENE_LEVEL_SIGNALS: list[tuple[set[str], str]] = [
     ),
 ]
 
+# 默认使用安全版（向后兼容）
+_SCENE_LEVEL_SIGNALS = _SCENE_LEVEL_SIGNALS_SAFE
 
-def _aggregate_scene_conditions(objects: list["SceneObject"]) -> list[str]:
+
+def _aggregate_scene_conditions(objects: list["SceneObject"], signals: list[tuple[set[str], str]] | None = None) -> list[str]:
     """聚合所有物证的 state/description 字段，生成场景级别的环境描述列表。
 
     作用：
@@ -360,13 +732,17 @@ def _aggregate_scene_conditions(objects: list["SceneObject"]) -> list[str]:
     - 即便原文只把"血迹"附着在某个物证上，本函数也将其提升为场景级别特征
       （地面血迹本质上是场景属性，不应只依附于单一物证）
 
+    signals: 指定使用的场景级别信号版本（安全版或详细版）
+
     Returns:
-        list[str]: 场景级别环境描述列表（去重，按 _SCENE_LEVEL_SIGNALS 顺序）
+        list[str]: 场景级别环境描述列表（去重，按 signals 顺序）
     """
     import logging
     logger = logging.getLogger(__name__)
 
-    # 收集所有可触发的文本
+    if signals is None:
+        signals = _SCENE_LEVEL_SIGNALS
+
     all_text: list[str] = []
     for obj in objects:
         if obj.state:
@@ -381,7 +757,7 @@ def _aggregate_scene_conditions(objects: list["SceneObject"]) -> list[str]:
 
     conditions: list[str] = []
     matched_signals: set[int] = set()
-    for idx, (triggers, desc) in enumerate(_SCENE_LEVEL_SIGNALS):
+    for idx, (triggers, desc) in enumerate(signals):
         for trigger in triggers:
             if trigger in combined:
                 conditions.append(desc)
@@ -667,6 +1043,8 @@ _PROMPT_WARNING_THRESHOLD = 8  # 超过此数量的物品时，前端提示教�
 def scene_objects_to_rich_prompt(
     scene: SceneState,
     case_style: str | None = None,
+    provider: str = "dalle",
+    detail_level: str = "auto",
 ) -> tuple[str, list[str]]:
     """
     将场景状态转为图像生成的 Rich Prompt（英文）。
@@ -674,6 +1052,14 @@ def scene_objects_to_rich_prompt(
     返回：
     - prompt: str — 最终用于 API 调用的 prompt
     - omitted_items: list[str] — 因超出长度上限而被省略的物品描述列表
+
+    参数：
+    - provider: 当前使用的图像生成模型名称
+    - detail_level: 细节级别
+      - "auto": 根据 provider 自动选择（zenmux→medium, 其他→detailed）
+      - "safe": 安全版（极简，确保通过安全过滤）
+      - "medium": 中等版（平衡安全和效果）
+      - "detailed": 详细版（完整细节）
 
     核心原则：
     - 代码控制 AI，不允许 AI 自由发挥
@@ -684,53 +1070,110 @@ def scene_objects_to_rich_prompt(
     import logging
     logger = logging.getLogger(__name__)
 
-    room_desc = _ROOM_TYPE_EN.get(scene.base_room_type, "a crime scene room")
+    # 确定细节级别
+    if detail_level == "auto":
+        if provider.lower() == "zenmux":
+            detail_level = "medium"
+        else:
+            detail_level = "detailed"
 
-    # 注入 case 级别风格描述
+    # 根据级别选择 prompt 模板
+    level_map = {
+        "safe":     (_CN_STATE_PATTERNS_SAFE,     _SCENE_LEVEL_SIGNALS_SAFE),
+        "medium":   (_CN_STATE_PATTERNS_MEDIUM,   _SCENE_LEVEL_SIGNALS_MEDIUM),
+        "detailed": (_CN_STATE_PATTERNS_DETAILED, _SCENE_LEVEL_SIGNALS_DETAILED),
+    }
+    state_patterns, scene_signals = level_map.get(
+        detail_level,
+        (_CN_STATE_PATTERNS_MEDIUM, _SCENE_LEVEL_SIGNALS_MEDIUM),
+    )
+    logger.info(
+        f"[scene_engine] 场景图 prompt 级别: {detail_level} "
+        f"(provider: {provider}, 物品数: {len(scene.objects)})"
+    )
+
+    room_desc = _ROOM_TYPE_EN.get(scene.base_room_type, "a room interior")
+
     case_style_prefix = ""
     if case_style:
         case_style_prefix = (
-            f" The scene is located in: {case_style}."
+            f" The interior setting is: {case_style}."
         )
 
-    # ⭐ 场景级环境条件（地面血迹/混乱/唾液等）— 不依附于单个物证
-    scene_conditions = _aggregate_scene_conditions(scene.objects)
+    # 场景级环境条件
+    scene_conditions = _aggregate_scene_conditions(scene.objects, signals=scene_signals)
     env_section = ""
     if scene_conditions:
         env_section = (
-            "\nSCENE ENVIRONMENT (CRITICAL — applies to the WHOLE scene, not just individual items):\n"
+            "\nSCENE ENVIRONMENT DETAILS:\n"
             + "\n".join(f"- {cond}" for cond in scene_conditions)
             + "\n"
         )
 
-    # 固定前缀（不可压缩部分）
-    prefix = (
-        f"Forensic crime scene investigation photo, {room_desc}."
-        f"{case_style_prefix}"
-        f" Crime scene tape visible. Professional forensic photography, "
-        f"overhead or wide-angle view, realistic, 4k, no people, no text."
-        f"{env_section}"
-        f" The following evidence items are present:\n"
-    )
-
-    # 固定后缀（增强约束，强调细节可见性和混乱程度）
-    suffix = (
-        "\nCRITICAL RENDERING RULES:\n"
-        "- EVERY item listed above MUST be clearly visible in the image.\n"
-        "- ALL state details (blood, saliva, fingerprints, stains, tears, breaks) "
-        "MUST be HIGHLY VISIBLE and clearly rendered on the items — vivid red "
-        "bloodstains must look bright red and prominent, not subtle.\n"
-        "- Saliva stains must be visible as dark wet patches.\n"
-        "- If any item has a 'chaotic' or 'messy' or 'overturned' state, the "
-        "overall scene should reflect signs of struggle, with items displaced, "
-        "scattered, and the environment in disarray.\n"
-        "- Place each item exactly as described with the described state and position.\n"
-        "- The SCENE ENVIRONMENT section above is NON-NEGOTIABLE — blood pools, "
-        "saliva stains, and chaotic state must be clearly visible at the scene level, "
-        "especially on the FLOOR (not only on individual items).\n"
-        "- Forensic evidence style, high detail, realistic lighting, sharp focus "
-        "on all evidence items."
-    )
+    # 根据级别选择前缀和后缀
+    if detail_level in ("safe", "medium"):
+        prefix = (
+            f"Educational training photograph, {room_desc}."
+            f"{case_style_prefix}"
+            f" Professional documentation photography, "
+            f"wide-angle view, realistic lighting, 4k high detail, no people, no text. "
+            f"The following items are present in the room:\n"
+            f"{env_section}"
+        )
+        if detail_level == "safe":
+            suffix = (
+                "\nRENDERING INSTRUCTIONS:\n"
+                "- Every item listed above must be clearly visible and properly placed.\n"
+                "- All surface details (marks, discolorations, scratches, breaks, "
+                "wet areas) must be clearly visible on the corresponding items.\n"
+                "- Red-brown marks must appear as distinct colorations on surfaces.\n"
+                "- If items show signs of being disturbed, the scene should reflect "
+                "a disarranged state with items out of their usual order.\n"
+                "- Place each item at the described position with its described condition.\n"
+                "- Sharp focus, professional quality, educational documentation photograph."
+            )
+        else:
+            suffix = (
+                "\nRENDERING INSTRUCTIONS:\n"
+                "- Every item listed above must be clearly visible and properly placed.\n"
+                "- All surface details (stains, marks, discolorations, scratches, "
+                "breaks, wet areas) must be clearly visible on the corresponding items.\n"
+                "- Reddish-brown stain marks must appear as distinct, noticeable "
+                "colorations on surfaces — not subtle or faint.\n"
+                "- Dark moist patches must be clearly visible as distinct wet areas.\n"
+                "- If items show signs of being disturbed, the overall scene should "
+                "reflect a messy, disarranged state with items displaced and scattered.\n"
+                "- The SCENE ENVIRONMENT DETAILS above must all be clearly visible, "
+                "especially stain patterns on the floor and surfaces.\n"
+                "- Place each item at the described position with its described condition.\n"
+                "- Sharp focus, professional quality, educational training photograph."
+            )
+    else:
+        prefix = (
+            f"Forensic crime scene investigation photo, {room_desc}."
+            f"{case_style_prefix}"
+            f" Crime scene tape visible. Professional forensic photography, "
+            f"overhead or wide-angle view, realistic, 4k, no people, no text."
+            f"{env_section}"
+            f" The following evidence items are present:\n"
+        )
+        suffix = (
+            "\nCRITICAL RENDERING RULES:\n"
+            "- EVERY item listed above MUST be clearly visible in the image.\n"
+            "- ALL state details (blood, saliva, fingerprints, stains, tears, breaks) "
+            "MUST be HIGHLY VISIBLE and clearly rendered on the items — vivid red "
+            "bloodstains must look bright red and prominent, not subtle.\n"
+            "- Saliva stains must be visible as dark wet patches.\n"
+            "- If any item has a 'chaotic' or 'messy' or 'overturned' state, the "
+            "overall scene should reflect signs of struggle, with items displaced, "
+            "scattered, and the environment in disarray.\n"
+            "- Place each item exactly as described with the described state and position.\n"
+            "- The SCENE ENVIRONMENT section above is NON-NEGOTIABLE — blood pools, "
+            "saliva stains, and chaotic state must be clearly visible at the scene level, "
+            "especially on the FLOOR (not only on individual items).\n"
+            "- Forensic evidence style, high detail, realistic lighting, sharp focus "
+            "on all evidence items."
+        )
 
     fixed_length = len(prefix) + len(suffix)
     available_chars = _MAX_PROMPT_CHARS - fixed_length
@@ -741,8 +1184,7 @@ def scene_objects_to_rich_prompt(
     current_length = 0
 
     for i, obj in enumerate(scene.objects):
-        # 构建单条物品描述 — 使用 _translate_state() 支持中英文状态键
-        state_desc = _translate_state(obj.state)
+        state_desc = _translate_state(obj.state, patterns=state_patterns)
         if state_desc:
             state_desc = f", {state_desc}"
 
@@ -751,8 +1193,11 @@ def scene_objects_to_rich_prompt(
             obj.render_position.get("zone", "floor_area"),
         )
 
-        # 完整格式
-        full_line = f"{i+1}. {obj.object_type} ({obj.description}){state_desc} — {position_desc}\n"
+        # ⭐ 物品描述增强：匹配常见类型，添加详细英文描述
+        item_name_en = _enrich_item_description(obj.description)
+
+        # 完整格式（使用增强的英文描述）
+        full_line = f"{i+1}. {item_name_en}{state_desc} — {position_desc}\n"
         # 紧凑格式（空间不足时使用）
         compact_line = f"{i+1}. {obj.description} — {position_desc}\n"
 

@@ -51,7 +51,7 @@ function CaseInput() {
           setTitle(file.name.replace(/\.(txt|pdf|docx)$/i, ""))
         }
       } else {
-        setLoadingMessage(`正在上传并解析 ${ext.toUpperCase()} 文件...`)
+        setLoadingMessage(`正在上传并解析 ${(ext || "").toUpperCase()} 文件...`)
         const caseTitle = title.trim() || file.name.replace(/\.(pdf|docx)$/i, "")
         const caseResult = await jevx.uploadAndCreateCase(file, caseTitle)
 

@@ -120,7 +120,7 @@ function EvidenceReview() {
     handleUpdate(id, { is_approved: true, is_excluded: false })
 
   const handleExclude = (id: number) =>
-    handleUpdate(id, { is_excluded: true, is_approved: false })
+    handleUpdate(id, { is_excluded: true, is_approved: false, scene_id: null })
 
   const handleLocationChange = (id: number, location: string) =>
     handleUpdate(id, { location })

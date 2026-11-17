@@ -511,9 +511,8 @@ def render_chat_screenshot(
             max_pixel_width=effective_wrap_width,
         )
         bubble_h = len(wrapped) * 24 + 20
-        y += bubble_h + 20  # 气泡 + 间距 + 时间戳行 + 间距
-        # 时间戳行
-        y += 20 + 8
+        # 时间戳(20) + 间距(8) + 标签(18) + 气泡 + 消息间距(8)
+        y += 20 + 8 + 18 + bubble_h + 8
 
     total_height = max(y + padding, nav_height + 200)
 
@@ -564,10 +563,20 @@ def render_chat_screenshot(
 
         if is_left:
             bubble_x = padding
-            sender_x = padding + 10
         else:
             bubble_x = phone_width - padding - bubble_w
-            sender_x = phone_width - padding - 10
+
+        # ⭐ 时间戳（移到气泡上方，居中显示）
+        if time_str:
+            tbbox = draw.textbbox((0, 0), time_str, font=font_time)
+            tw = tbbox[2] - tbbox[0]
+            draw.text(
+                ((phone_width - tw) / 2, y),
+                time_str,
+                fill=(180, 180, 180),
+                font=font_time,
+            )
+            y += 20 + 8  # 时间戳高度 + 下方间距
 
         # 发送者标签（确保不超出画布边界）
         sender_label = msg.get("sender_name", "")
@@ -575,12 +584,7 @@ def render_chat_screenshot(
             sender_label = "对方" if is_left else "本人"
 
         # 计算标签最大可用宽度
-        if is_left:
-            # 左侧：左对齐，最多占气泡宽度的 80%，但不超过左边界 + 气泡宽 - 气泡内padding
-            max_label_w = bubble_w - 20
-        else:
-            # 右侧：右对齐，最多占气泡宽度的 80%
-            max_label_w = bubble_w - 20
+        max_label_w = bubble_w - 20
 
         # 截断过长的发送者名称
         label_w = _measure_text_width(font_sender, sender_label)
@@ -622,21 +626,7 @@ def render_chat_screenshot(
             draw.text((bubble_x + 12, text_y), line, fill=(0, 0, 0), font=font_msg)
             text_y += 24
 
-        y += bubble_h + 6
-
-        # 时间戳
-        if time_str:
-            tbbox = draw.textbbox((0, 0), time_str, font=font_time)
-            tw = tbbox[2] - tbbox[0]
-            draw.text(
-                ((phone_width - tw) / 2, y),
-                time_str,
-                fill=(180, 180, 180),
-                font=font_time,
-            )
-            y += 20
-
-        y += 8  # 消息间距
+        y += bubble_h + 8  # 气泡 + 消息间距
 
     # --- 保存 ---
     if output_path is None:

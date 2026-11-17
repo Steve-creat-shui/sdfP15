@@ -850,7 +850,7 @@ class ZenMuxProvider(BaseImageProvider):
     """
 
     _base_url: str = "https://zenmux.ai/api/v1"
-    _model: str = "gpt-image-2"
+    _model: str = "openai/gpt-image-2"
 
     def __init__(self, api_key: str | None = None):
         self._api_key = api_key or ""
@@ -891,8 +891,8 @@ class ZenMuxProvider(BaseImageProvider):
         return AsyncOpenAI(
             api_key=self._api_key,
             base_url=self._base_url,
-            timeout=httpx.Timeout(180.0, connect=10.0),
-            max_retries=2,
+            timeout=httpx.Timeout(600.0, connect=30.0),
+            max_retries=1,
         )
 
     async def generate(self, prompt: str, size: str = "1024x1024") -> bytes:
@@ -900,13 +900,13 @@ class ZenMuxProvider(BaseImageProvider):
 
         GPT-Image-2 是 OpenAI 最新一代图像生成模型，
         写实度和理解力都非常出色。
-        包含重试逻辑，最多重试 2 次，全部失败时返回占位图。
+        包含重试逻辑，生成时间可能较长，耐心等待。
         """
         import base64
         import logging
         logger = logging.getLogger(__name__)
 
-        max_retries = 2
+        max_retries = 3
         last_error: Exception | None = None
 
         # ZenMux/GPT-Image-2 支持的尺寸映射
@@ -920,6 +920,10 @@ class ZenMuxProvider(BaseImageProvider):
         for attempt in range(max_retries + 1):
             try:
                 client = self._get_client()
+                logger.info(
+                    f"[ZenMuxProvider] 第 {attempt + 1}/{max_retries + 1} 次尝试生成图片 "
+                    f"(prompt长度: {len(prompt)}, size: {api_size})"
+                )
                 response = await client.images.generate(
                     model=self._model,
                     prompt=prompt,
@@ -937,23 +941,38 @@ class ZenMuxProvider(BaseImageProvider):
                 if b64_json:
                     return base64.b64decode(b64_json)
 
-                # 下载生成的图片（带超时）
-                async with httpx.AsyncClient(timeout=60.0) as http_client:
+                # 下载生成的图片（带超时，ZenMux 图片下载可能较慢）
+                async with httpx.AsyncClient(timeout=120.0) as http_client:
                     resp = await http_client.get(image_url)
                     resp.raise_for_status()
                     return resp.content
 
             except Exception as e:
                 last_error = e
-                logger.warning(f"[ZenMuxProvider] 第 {attempt + 1}/{max_retries + 1} 次尝试失败: {type(e).__name__}: {str(e)[:80]}")
+                error_str = str(e)
+                logger.warning(
+                    f"[ZenMuxProvider] 第 {attempt + 1}/{max_retries + 1} 次尝试失败: "
+                    f"{type(e).__name__}: {error_str[:120]}"
+                )
+                # ⭐ 如果是安全系统拦截（safety system rejection），立即抛出异常让上层 fallback
+                if "safety system" in error_str.lower():
+                    logger.error(
+                        f"[ZenMuxProvider] 安全系统拦截，立即抛出异常触发 fallback"
+                    )
+                    raise
                 if attempt < max_retries:
-                    import asyncio
-                    await asyncio.sleep(2 * (attempt + 1))  # 递增等待
+                    wait_sec = 5 * (attempt + 1)
+                    logger.info(f"[ZenMuxProvider] {wait_sec}s 后重试...")
+                    await asyncio.sleep(wait_sec)
 
-        logger.error(f"[ZenMuxProvider] 全部 {max_retries + 1} 次尝试均失败 | 最后错误: {type(last_error).__name__}: {str(last_error)[:100]}")
+        logger.error(
+            f"[ZenMuxProvider] 全部 {max_retries + 1} 次尝试均失败 | "
+            f"最后错误: {type(last_error).__name__}: {str(last_error)[:150]}"
+        )
         return self._make_placeholder(
             prompt,
-            f"ZenMux GPT-Image-2 生成失败（已重试 {max_retries} 次）\n最后错误: {type(last_error).__name__}"
+            f"ZenMux GPT-Image-2 生成失败（已重试 {max_retries} 次）\n"
+            f"最后错误: {type(last_error).__name__}"
         )
 
     async def inpaint(
@@ -1156,22 +1175,89 @@ class ImageRouter:
         - image_path: str — 生成图片的本地路径
         - omitted_items: list[str] — 因 prompt 长度超限被省略的物品（用于前端提示）
         """
-        provider_name = self.config.get("scene_overview", "dalle")
-        provider = self._get_provider(provider_name)
-
-        prompt, omitted_items = scene_objects_to_rich_prompt(scene, case_style=case_style)
-
-        # 记录使用的 prompt（用于审计）
         import logging
         logger = logging.getLogger(__name__)
-        logger.info(
-            f"[image_router] 生成场景图 | provider: {provider_name} | "
-            f"场景: {scene.scene_name} | 物品数: {len(scene.objects)} | prompt长度: {len(prompt)}"
-        )
 
-        raw_bytes = await provider.generate(prompt, size="1024x1024")
+        provider_name = self.config.get("scene_overview", "dalle")
+
+        # ⭐ 自动 fallback：首选 provider 失败时，尝试其他可用 provider
+        fallback_order = ["dalle", "zenmux", "agnes", "flux", "hunyuan"]
+        providers_to_try = [provider_name] + [p for p in fallback_order if p != provider_name]
+
+        # ⭐ 渐进式 prompt 降级策略（针对 ZenMux 等安全过滤严格的模型）
+        # 先用最详细的级别，如果被安全系统拦截就降级
+        zenmux_levels = ["detailed", "medium", "safe"]
+        default_levels = ["detailed"]
+
+        last_error: Exception | None = None
+        raw_bytes: bytes | None = None
+        used_provider = provider_name
+        omitted_items: list[str] = []
+
+        for idx, p_name in enumerate(providers_to_try):
+            if idx > 0:
+                logger.info(
+                    f"[image_router] 第 {idx + 1} 次尝试，切换到 provider: {p_name}"
+                )
+            provider = self._get_provider(p_name)
+
+            # 每个 provider 内部做 prompt 降级
+            detail_levels = zenmux_levels if p_name.lower() == "zenmux" else default_levels
+            for level in detail_levels:
+                try:
+                    prompt, omitted_items = scene_objects_to_rich_prompt(
+                        scene, case_style=case_style, provider=p_name, detail_level=level
+                    )
+                    logger.info(
+                        f"[image_router] 尝试 provider={p_name}, level={level}, "
+                        f"prompt长度={len(prompt)}"
+                    )
+                    raw_bytes = await provider.generate(prompt, size="1024x1024")
+                    used_provider = p_name
+                    if level != detail_levels[0]:
+                        logger.info(
+                            f"[image_router] 降级成功: 从 {detail_levels[0]} 降级到 {level} 后生成成功"
+                        )
+                    break
+                except Exception as e:
+                    error_str = str(e).lower()
+                    last_error = e
+                    # 如果是安全系统拦截，降级再试
+                    if "safety system" in error_str and level != detail_levels[-1]:
+                        next_level = detail_levels[detail_levels.index(level) + 1]
+                        logger.warning(
+                            f"[image_router] 安全系统拦截 (level={level}), "
+                            f"降级到 {next_level} 后重试"
+                        )
+                        continue
+                    # 其他错误或已降级到最低级，跳出当前 provider
+                    logger.warning(
+                        f"[image_router] Provider {p_name} level={level} 失败: "
+                        f"{type(e).__name__}: {str(e)[:80]}"
+                    )
+                    break
+
+            if raw_bytes is not None:
+                break
+
+            if idx >= len(providers_to_try) - 1:
+                logger.error(
+                    f"[image_router] 全部 fallback 尝试均失败 | 最后错误: {type(last_error).__name__}"
+                )
+                raise last_error or RuntimeError("All providers failed")
+
+        if raw_bytes is None:
+            raise last_error or RuntimeError("Image generation failed")
+
         dirs = self._case_dirs(case_id)
         image_path = self._save_image(dirs["scenes"], f"scene_{scene.scene_id}", raw_bytes)
+        
+        # 如果切换了 provider，记录日志
+        if used_provider != provider_name:
+            logger.info(
+                f"[image_router] 生成成功，但切换了 provider: {provider_name} -> {used_provider}"
+            )
+
         return image_path, omitted_items
 
     async def insert_object(

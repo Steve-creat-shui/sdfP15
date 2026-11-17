@@ -313,5 +313,8 @@ def get_evidences_by_scene(*, session: Session, scene_id: int) -> list[Evidence]
 def get_scene_evidence_count(*, session: Session, scene_id: int) -> int:
     """Get the number of evidence items assigned to a scene."""
     return session.exec(
-        select(func.count(Evidence.id)).where(Evidence.scene_id == scene_id)
+        select(func.count(Evidence.id)).where(
+            Evidence.scene_id == scene_id,
+            Evidence.is_excluded == False,
+        )
     ).one()

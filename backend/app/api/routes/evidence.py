@@ -189,9 +189,17 @@ async def create_case_from_file(
     - file: 案件材料文件（.txt / .pdf / .docx）
     - title: 案件标题（可选，默认使用文件名）
     """
+    import logging
+    logger = logging.getLogger(__name__)
+
+    filename = file.filename or "untitled"
+    logger.info(f"[upload] 收到上传请求: filename={filename}, content_type={file.content_type}")
+
     # 校验文件大小（限制 20MB）
     MAX_SIZE = 20 * 1024 * 1024
     content = await file.read()
+    logger.info(f"[upload] 文件大小: {len(content)} bytes ({len(content)/1024:.1f} KB)")
+
     if len(content) > MAX_SIZE:
         raise HTTPException(
             status_code=413,
@@ -202,12 +210,14 @@ async def create_case_from_file(
         raise HTTPException(status_code=400, detail="上传的文件为空。")
 
     # 解析文件提取文本
-    filename = file.filename or "untitled"
     try:
         raw_text = FileParser.parse(content, filename=filename)
+        logger.info(f"[upload] 文件解析成功: 提取文本 {len(raw_text)} 字符")
     except ValueError as e:
+        logger.warning(f"[upload] 文件解析失败(ValueError): {e}")
         raise HTTPException(status_code=422, detail=str(e))
     except Exception as e:
+        logger.error(f"[upload] 文件解析异常({type(e).__name__}): {e}", exc_info=True)
         raise HTTPException(
             status_code=500,
             detail=f"文件解析失败: {str(e)}",
@@ -544,6 +554,11 @@ def build_scene(
         scene_name=scene.scene_name,
         state_json=state_json,
     )
+
+    # 将已确认证据分配到该场景
+    for ev in approved:
+        ev.scene_id = db_scene.id
+    session.commit()
 
     # 更新案件状态
     crud.update_case(

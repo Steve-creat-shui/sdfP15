@@ -71,21 +71,6 @@ interface CloseupState {
 // ==============================================================================
 
 const IMAGE_PATH_PREFIX = "/api/v1/static/images/"
-const ROOM_TYPE_LABELS: Record<string, string> = {
-  bedroom: "卧室",
-  living_room: "客厅",
-  reception_room: "接待室",
-  kitchen: "厨房",
-  bathroom: "浴室",
-  office: "办公室",
-  conference_room: "会议室",
-  hallway: "走廊",
-  garage: "车库",
-  warehouse: "仓库",
-  balcony: "阳台",
-  outdoor: "户外",
-  unknown: "未知",
-}
 
 // ==============================================================================
 // Helpers
@@ -766,7 +751,7 @@ function ImageGenerate() {
                               <input
                                 type="checkbox"
                                 checked={selectedImageIds.has(cs.imageId)}
-                                onChange={() => toggleImageId(cs.imageId)}
+                                onChange={() => toggleImageId(cs.imageId!)}
                                 className="h-4 w-4 shrink-0 rounded border-apple-glass-border/50 accent-apple-accent"
                               />
                             )}
@@ -801,7 +786,7 @@ function ImageGenerate() {
                                   特写
                                 </AppleButton>
                                 <AppleButton
-                                  variant={isExpanded ? "accent" : "ghost"}
+                                  variant={isExpanded ? "default" : "ghost"}
                                   className="h-7 w-7 p-0 shrink-0"
                                   title={isExpanded ? "收起细节" : "添加细节描述"}
                                   onClick={() => {
@@ -877,7 +862,6 @@ function ImageGenerate() {
               </h3>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {closeupImages.map((img) => {
-                  const cState = closeups[img.id]
                   const strategy = img.closeup_strategy || img.strategy_used
                   return (
                     <GlassCard key={img.id}>
